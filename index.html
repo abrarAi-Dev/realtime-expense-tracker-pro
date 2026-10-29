@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realtime Expense Tracker Pro - Track spending, budgets, and debt payoff</title>
+<meta name="description" content="Track spending, budgets, and recurring bills - and see exactly when a debt will be gone. A smarter expense tracker with a built-in debt-payoff planner.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <nav class="nav"><span class="logo">💸 Realtime Expense Tracker Pro</span><a href="https://github.com/abrarAi-Dev/realtime-expense-tracker-pro" target="_blank" rel="noopener">GitHub</a></nav>
+  <h1>Know where it goes. Know when debt ends.</h1>
+  <p class="sub">Most expense trackers stop at a list of transactions. This one adds category budgets that warn you before you overspend, recurring bills with real due dates, a spending chart, CSV export, and a debt-payoff planner that shows the exact month you will be debt-free and what paying a little extra actually saves you.</p>
+  <div class="hero-cta"><a class="btn" href="#add">Add an entry</a><a class="btn ghost" href="#debt">Plan a debt payoff</a></div>
+  <p class="disclaimer">Everything runs in your browser and is saved only on this device. The debt planner is an estimate, not financial advice.</p>
+</header>
+
+<main>
+  <section class="summary" aria-label="Summary">
+    <div class="stat"><span>Balance</span><strong id="balanceValue">$0.00</strong></div>
+    <div class="stat income"><span>Total income</span><strong id="incomeValue">$0.00</strong></div>
+    <div class="stat expense"><span>Total expenses</span><strong id="expenseValue">$0.00</strong></div>
+  </section>
+
+  <section id="add" class="card">
+    <h2>1. Add income or expense</h2>
+    <form id="entryForm">
+      <div class="row">
+        <label>Description <input id="entryDesc" type="text" required placeholder="e.g. Groceries, Salary, Rent"></label>
+        <label>Amount (USD) <input id="entryAmount" type="number" required min="0.01" step="0.01" placeholder="0.00"></label>
+      </div>
+      <div class="row">
+        <label>Type
+          <select id="entryType">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </label>
+        <label>Category <select id="entryCategory"></select></label>
+        <label>Date <input id="entryDate" type="date" required></label>
+      </div>
+      <button class="btn" type="submit">Add entry</button>
+    </form>
+    <div class="toolbar">
+      <label class="inline">Filter
+        <select id="filterCategory"><option value="">All categories</option></select>
+      </label>
+      <input id="searchInput" type="text" placeholder="Search entries...">
+    </div>
+    <div id="entryList"></div>
+    <p id="entryEmpty" class="hint">No entries yet. Add one above, or load sample data below to see how it works.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. Category budgets</h2>
+    <p class="hint">Set a monthly limit per expense category. Progress is based on spending in the current month. Bars turn amber as you approach the limit and red when you go over.</p>
+    <form id="budgetForm" class="row-form">
+      <label>Category <select id="budgetCategory"></select></label>
+      <label>Monthly limit (USD) <input id="budgetAmount" type="number" min="0" step="1" placeholder="e.g. 400"></label>
+      <button class="btn" type="submit">Set budget</button>
+    </form>
+    <div id="budgetList"></div>
+    <p id="budgetEmpty" class="hint">No budgets set yet.</p>
+  </section>
+
+  <section class="card">
+    <h2>3. Spending by category</h2>
+    <p class="hint">Totals across all your expense entries, biggest first.</p>
+    <canvas id="categoryChart" width="820" height="280" aria-label="Spending by category chart"></canvas>
+    <div id="categoryBars"></div>
+    <p id="chartEmpty" class="hint">Add some expenses and the chart will appear here.</p>
+  </section>
+
+  <section class="card">
+    <h2>4. Recurring bills</h2>
+    <form id="billForm">
+      <div class="row">
+        <label>Bill name <input id="billName" type="text" required placeholder="e.g. Rent, Internet, Gym"></label>
+        <label>Amount (USD) <input id="billAmount" type="number" required min="0" step="0.01" placeholder="0.00"></label>
+      </div>
+      <div class="row">
+        <label>Due day of month <input id="billDueDay" type="number" required min="1" max="31" placeholder="e.g. 15"></label>
+        <label>Category <select id="billCategory"></select></label>
+      </div>
+      <button class="btn" type="submit">Add bill</button>
+    </form>
+    <div id="billList"></div>
+    <p id="billEmpty" class="hint">No recurring bills yet.</p>
+  </section>
+
+  <section id="debt" class="card highlight">
+    <h2>5. Debt-payoff planner</h2>
+    <p class="hint">The signature upgrade. Enter a balance, APR, and monthly payment and see the payoff month, total interest, and exactly what an extra payment saves you in time and money.</p>
+    <div class="row">
+      <label>Debt balance (USD) <input id="debtBalance" type="number" min="0" step="0.01" placeholder="e.g. 5000"></label>
+      <label>APR (%) <input id="debtApr" type="number" min="0" step="0.01" placeholder="e.g. 22.99"></label>
+    </div>
+    <div class="row">
+      <label>Monthly payment (USD) <input id="debtPayment" type="number" min="0" step="0.01" placeholder="e.g. 200"></label>
+      <label>Extra per month (USD) <input id="debtExtra" type="number" min="0" step="0.01" placeholder="e.g. 50"></label>
+    </div>
+    <button class="btn" id="debtBtn">Calculate payoff</button>
+    <button class="btn ghost" id="debtSampleBtn">Try a sample debt</button>
+    <div id="debtResult" class="result hidden"></div>
+  </section>
+
+  <section class="card">
+    <h2>Your data</h2>
+    <p class="hint">Stored only in your browser (localStorage). Nothing leaves your device. Export regularly if the data matters to you.</p>
+    <button class="btn" id="exportBtn">Export CSV</button>
+    <button class="btn ghost" id="sampleBtn">Load sample data</button>
+    <button class="btn danger" id="clearBtn">Clear all data</button>
+  </section>
+</main>
+
+<footer>
+  <p>Built by <a href="https://github.com/abrarAi-Dev" target="_blank" rel="noopener">Abrar Shariff Mohammed</a> · Realtime Expense Tracker Pro v1 · Estimates only, not financial advice.</p>
+</footer>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
