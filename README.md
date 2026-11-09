@@ -4,7 +4,7 @@
 
 Most expense trackers stop at a pretty list of transactions. This one keeps going: budgets that warn you before you overspend, bills with real next due dates, a spending breakdown you can actually read, and a debt-payoff planner that answers the question people really care about: if I pay this much a month, when am I done, and what does paying a little extra actually save me?
 
-**Live demo:** https://abrarAi-Dev.github.io/realtime-expense-tracker-pro/ (GitHub Pages, enable in repo Settings, then Pages, then main branch if it is not live yet)
+**Demo (staged for Vercel):** https://realtime-expense-tracker-pro.vercel.app - this link goes live once the repo is connected to Vercel. It is not live yet.
 
 ## What it does (v1)
 
@@ -39,6 +39,16 @@ No build step. Open `index.html` in a browser, or serve the folder:
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
+
+## Deploying on Vercel
+
+This project is ready to import into Vercel as-is:
+
+- Framework preset: **Other**
+- Build command: none
+- Output directory: the repo root (where `index.html` lives)
+
+No `vercel.json` is needed - Vercel's defaults for a plain static site match this layout exactly, so there is nothing to correct.
 
 ## Honest limits
 
